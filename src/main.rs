@@ -7,7 +7,9 @@ struct GrepInput {
 }
 
 fn main() {
-    let input = process_input( env::args().collect() );
+    let args: Vec<String> = env::args().collect();
+    // let ( query, filename ) = parse_config(&args);
+    let input = process_input( &args );
 
     println!("Searching for {}", input.query);
     println!("In file {}", input.filename);
@@ -19,7 +21,14 @@ fn main() {
 
 }
 
-fn process_input( args: Vec<String> ) -> GrepInput {
+fn parse_config( args: &[String] ) -> (&str, &str) {
+    let query = &args[1];
+    let filename = &args[2];
+
+    (query, filename)
+}
+
+fn process_input( args: &[String] ) -> GrepInput {
     let mut input = GrepInput{
         query: String::from(""),
         filename: String::from("")
@@ -42,26 +51,30 @@ mod tests {
 
     #[test]
     fn process_input_filename() {
-        let input = process_input(vec![ String::from("cmd"), String::from("query_str"), String::from("file.txt") ]);
+        let args = vec![ String::from("cmd"), String::from("query_str"), String::from("file.txt") ];
+        let input = process_input(&args);
         assert_eq!( input.filename, "file.txt" );
     }
 
     #[test]
     fn process_input_query() {
-        let input = process_input(vec![ String::from("cmd"), String::from("query_str"), String::from("file.txt") ]);
+        let args = vec![ String::from("cmd"), String::from("query_str"), String::from("file.txt") ];
+        let input = process_input(&args);
         assert_eq!( input.query, "query_str" );
     }
 
     #[test]
     fn process_input_cmd_only() {
-        let input = process_input(vec![ String::from("cmd") ]);
+        let args = vec![ String::from("cmd") ];
+        let input = process_input(&args);
         assert_eq!( input.query, "" );
         assert_eq!( input.filename, "" );
     }
 
     #[test]
     fn process_input_query_str_only() {
-        let input = process_input(vec![ String::from("cmd"), String::from("query_str") ]);
+        let args = vec![ String::from("cmd"), String::from("query_str") ];
+        let input = process_input(&args);
         assert_eq!( input.query, "query_str" );
         assert_eq!( input.filename, "" );
     }
