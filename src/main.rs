@@ -1,5 +1,6 @@
 use std::env;
 use std::fs;
+use std::process;
 
 struct Config {
     query: String,
@@ -32,8 +33,10 @@ mod test_config_object {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    // let ( query, filename ) = parse_config(&args);
-    let input = parse_config(&args);
+    let input = Config::new(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {}", err);
+        process::exit(1);
+    });
 
     println!("Searching for {}", input.query);
     println!("In file {}", input.filename);
