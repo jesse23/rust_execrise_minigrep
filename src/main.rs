@@ -1,4 +1,5 @@
 use std::env;
+use std::error::Error;
 use std::fs;
 use std::process;
 
@@ -33,76 +34,25 @@ mod test_config_object {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let input = Config::new(&args).unwrap_or_else(|err| {
+    let config = Config::new(&args).unwrap_or_else(|err| {
         println!("Problem parsing arguments: {}", err);
         process::exit(1);
     });
 
-    println!("Searching for {}", input.query);
-    println!("In file {}", input.filename);
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
 
-    let contents =
-        fs::read_to_string(input.filename).expect("Something went wrong reading the file");
+    if let Err(e) = run(config) {
+        println!("Application error: {}", e);
+
+        process::exit(1);
+    }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.filename)?;
 
     println!("With text:\n{}", contents);
-}
 
-fn parse_config(args: &[String]) -> Config {
-    let mut input = Config {
-        query: String::from(""),
-        filename: String::from(""),
-    };
-
-    if args.len() > 1 {
-        input.query = args[1].clone();
-    }
-
-    if args.len() > 2 {
-        input.filename = args[2].clone();
-    }
-
-    return input;
-}
-
-#[cfg(test)]
-mod test_parse_config {
-    use super::*;
-
-    #[test]
-    fn parse_config_filename() {
-        let args = vec![
-            String::from("cmd"),
-            String::from("query_str"),
-            String::from("file.txt"),
-        ];
-        let input = parse_config(&args);
-        assert_eq!(input.filename, "file.txt");
-    }
-
-    #[test]
-    fn parse_config_query() {
-        let args = vec![
-            String::from("cmd"),
-            String::from("query_str"),
-            String::from("file.txt"),
-        ];
-        let input = parse_config(&args);
-        assert_eq!(input.query, "query_str");
-    }
-
-    #[test]
-    fn parse_config_cmd_only() {
-        let args = vec![String::from("cmd")];
-        let input = parse_config(&args);
-        assert_eq!(input.query, "");
-        assert_eq!(input.filename, "");
-    }
-
-    #[test]
-    fn parse_config_query_str_only() {
-        let args = vec![String::from("cmd"), String::from("query_str")];
-        let input = parse_config(&args);
-        assert_eq!(input.query, "query_str");
-        assert_eq!(input.filename, "");
-    }
+    Ok(())
 }
