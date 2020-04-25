@@ -27,13 +27,35 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut result = Vec::new();
+    for line in contents.lines() {
+        if line.contains(query) {
+            // do something with line
+            result.push(line);
+        }
+    }
+    return result;
+}
+
 #[cfg(test)]
-mod test_config_object {
+mod tests {
     use super::*;
 
     #[test]
     fn config_param_exceed() {
         let args = vec![String::from("cmd")];
         assert_eq!(Config::new(&args).err(), Some("not enough arguments"));
+    }
+
+    #[test]
+    fn one_result() {
+        let query = "duct";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.";
+
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 }
