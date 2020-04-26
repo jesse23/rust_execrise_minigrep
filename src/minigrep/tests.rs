@@ -1,9 +1,47 @@
 use super::*;
+use std::env;
 
-#[test]
-fn config_param_exceed() {
-    let args = vec![String::from("cmd")];
-    assert_eq!(Config::new(&args).err(), Some("not enough arguments"));
+mod config_test {
+    use super::*;
+    #[test]
+    fn config_param_exceed() {
+        let args = vec![String::from("cmd")];
+        assert_eq!(Config::new(&args).err(), Some("not enough arguments"));
+    }
+}
+
+mod get_case_sensitive_test {
+    use super::*;
+    #[test]
+    fn get_case_sensitive_default() {
+        let key = "CASE_INSENSITIVE";
+        env::remove_var(key);
+        assert_eq!(get_case_sensitive_cfg(), false);
+    }
+
+    // TODO: need xUnit framework like:
+    // https://medium.com/@ericdreichert/test-setup-and-teardown-in-rust-without-a-framework-ba32d97aa5ab
+    #[test]
+    fn get_case_sensitive_true() {
+        let key = "CASE_INSENSITIVE";
+        env::set_var(key, "true");
+        assert_eq!(get_case_sensitive_cfg(), true);
+        /*
+        assert_eq!(env::var(key), Ok("true".to_string()));
+        */
+        env::remove_var(key);
+    }
+
+    #[test]
+    fn get_case_sensitive_false() {
+        let key = "CASE_INSENSITIVE";
+        env::set_var(key, "false");
+        assert_eq!(get_case_sensitive_cfg(), false);
+        /*
+        assert_eq!(env::var(key), Ok("true".to_string()));
+        */
+        env::remove_var(key);
+    }
 }
 
 #[test]

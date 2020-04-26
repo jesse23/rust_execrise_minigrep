@@ -16,13 +16,12 @@ impl Config {
 
         let query = args[1].clone();
         let filename = args[2].clone();
-
-        let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
+        let case_sensitive = get_case_sensitive_cfg();
 
         Ok(Config {
             query,
             filename,
-            case_sensitive: false,
+            case_sensitive,
         })
     }
 }
@@ -41,6 +40,10 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+pub fn get_case_sensitive_cfg() -> bool {
+    return !env::var("CASE_INSENSITIVE").is_err();
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
