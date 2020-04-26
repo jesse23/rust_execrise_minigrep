@@ -1,6 +1,7 @@
 use std::env;
 use std::error::Error;
 use std::fs;
+use std::str::FromStr;
 
 pub struct Config {
     pub query: String,
@@ -42,8 +43,8 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub fn get_case_sensitive_cfg() -> bool {
-    return !env::var("CASE_INSENSITIVE").is_err();
+pub fn get_case_sensitive_cfg() -> String {
+    env::var("CASE_INSENSITIVE").unwrap_or_else(|err| String::from("false"))
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
