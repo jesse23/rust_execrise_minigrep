@@ -1,4 +1,6 @@
 // https://github.com/rust-lang/rls-vscode/issues/513
+mod minigrep;
+
 use minigrep::run;
 use minigrep::Config;
 use std::env;
